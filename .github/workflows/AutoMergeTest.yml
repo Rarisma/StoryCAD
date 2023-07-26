@@ -33,14 +33,13 @@ jobs:
             exit 1
         fi
 
+        # Always print the content of the file
+        echo "-------File Content Start--------"
+        cat $MANIFEST_PATH || echo "Failed to print the content of $MANIFEST_PATH"
+        echo "-------File Content End--------"
+
         # Check if the file has a conflict
-        if grep -q '<<<<<<< ' $MANIFEST_PATH; then
-
-          # Debug: Print the content of the file
-          echo "-------File Content Start--------"
-          cat $MANIFEST_PATH || echo "Failed to print the content of $MANIFEST_PATH"
-          echo "-------File Content End--------"
-
+        if grep -q '<<<<<<<' $MANIFEST_PATH; then
           # Extract both versions
           VERSION1=$(grep -oP '(?<=Version=")[^"]*' $MANIFEST_PATH | sed -n '1p')
           VERSION2=$(grep -oP '(?<=Version=")[^"]*' $MANIFEST_PATH | sed -n '2p')
@@ -55,7 +54,7 @@ jobs:
           echo "Higher Version: $HIGHER_VERSION"
 
           # Replace the conflicting lines with the higher version
-          sed -i "/<<<<<<< /,/>>>>>>> /c\    <Identity Name=\"34432StoryBuilder.StoryBuilder\" Publisher=\"CN=34A1944E-942C-4545-B217-ECE68E54ACF8\" Version=\"$HIGHER_VERSION\" />" $MANIFEST_PATH
+          sed -i "/<<<<<<</,/>>>>>>>/c\    <Identity Name=\"34432StoryBuilder.StoryBuilder\" Publisher=\"CN=34A1944E-942C-4545-B217-ECE68E54ACF8\" Version=\"$HIGHER_VERSION\" />" $MANIFEST_PATH
 
           # Debug: Print the content of the file after the sed command
           echo "-------Updated File Content Start--------"
