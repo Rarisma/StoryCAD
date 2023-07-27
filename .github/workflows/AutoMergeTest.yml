@@ -1,24 +1,29 @@
+name: Resolve Package.appxmanifest Conflicts
+
+on:
+  pull_request_target:
+    paths:
+      - 'StoryCAD/Package.appxmanifest'
+    types: [opened, synchronize, reopened]
+
 jobs:
   resolve-conflicts:
     runs-on: windows-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-
-      - name: Debug - Show current directory and its contents
-        run: |
-          pwd
-          ls -la
+        with:
+          ref: ${{ github.head_ref }}
 
       - name: Check for conflicted Package.appxmanifest
         id: check_conflicted
         run: |
           $isConflicted = git diff --check | Select-String -Pattern "^[+-]{7}\s" -Quiet
           echo "Is Conflicted: $isConflicted"
-          echo "IS_CONFLICTED=$isConflicted" >> $GITHUB_ENV
+          echo "::set-output name=is_conflicted::$isConflicted"
 
       - name: Resolve conflicts if any
-        if: env.IS_CONFLICTED == 'True'
+        if: steps.check_conflicted.outputs.is_conflicted == 'True'
         run: |
           git checkout --theirs -- 'StoryCAD/Package.appxmanifest'
           git add 'StoryCAD/Package.appxmanifest'
