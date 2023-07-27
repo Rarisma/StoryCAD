@@ -1,4 +1,4 @@
-name: Resolve Manifest Conflict
+name: Resolve Manifest Conflict 
 
 on:
   pull_request_target:
