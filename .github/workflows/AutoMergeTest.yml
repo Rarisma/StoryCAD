@@ -10,11 +10,17 @@ jobs:
   resolve-conflict:
     runs-on: windows-latest
     steps:
+
     - name: Checkout code
       uses: actions/checkout@v2
       with:
         ref: ${{ github.event.pull_request.head.sha }} # Check out the incoming branch
 
+    - name: jake debug
+      run: |
+        dir
+        cd ${{ github.workspace }}
+        Test-Path -Path .git
     - name: Resolve conflict in Package.appxmanifest
       run: |
         Set-Location ${{ github.workspace }}
