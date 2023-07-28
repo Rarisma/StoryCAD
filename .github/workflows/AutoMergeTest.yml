@@ -1,4 +1,4 @@
-name: Resolve Manifest Conflict 
+name: AppxConflictFixer
 
 on:
   pull_request_target:
@@ -16,7 +16,7 @@ jobs:
       with:
         ref: ${{ github.event.pull_request.head.sha }} # Check out the incoming branch
 
-    - name: jake debug
+    - name: debug
       run: |
         dir
         cd ${{ github.workspace }}
@@ -24,7 +24,7 @@ jobs:
         
     - name: Resolve conflict in Package.appxmanifest
       run: |
-        Set-Location ${{ github.workspace }}
+        cd ${{ github.workspace }}
         $conflicted = (git diff --name-only --diff-filter=U) -contains 'StoryCAD/Package.appxmanifest'
         if ($conflicted) {
           git checkout --theirs StoryCAD/Package.appxmanifest
@@ -36,7 +36,7 @@ jobs:
     - name: Push changes if conflict resolved
       run: |
         Set-Location ${{ github.workspace }}
-        if (git log -1 --pretty=%B -s | Select-String -Pattern "Resolved conflict in Package.appxmanifest by taking incoming changes") {
+        if (git log -1 --pretty=%B -s | Select-String -Pattern "Resolved conflict in Package.appxmanifest") {
           git push origin ${{ github.event.pull_request.head.ref }}
         }
       shell: pwsh
